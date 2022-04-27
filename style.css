@@ -12,7 +12,7 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url("4.jpg");
+    background: url("background3.jpg");
     background-size: cover;
 }
 
@@ -78,4 +78,58 @@ body{
 img{
     border-radius: 50%;
     box-shadow: rgba(0,0,0,1);
+}
+.profile{
+    position: relative;
+    width: 300px;
+    height: 400px;
+    margin: 30px;
+    box-shadow: 20px 20px 50px rgba(0,0,0,0.5);
+    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.5);
+    border-left: 1px solid rgba(255,255,255,0.5);
+    backdrop-filter: blur(5px);
+}
+.profile h3{
+    top: 50%;
+    position: absolute;
+    text-align: center;
+    align-items: center;
+    font-size: 1em;
+    color: #fff;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif; 
+}
+.profile img{
+    position: absolute;
+    top: 20%;
+}
+.profile p{
+    line-break: normal;
+}
+.profile h5{
+    top: 60%;
+    position: absolute;
+    text-align: center;
+    align-items: center;
+    font-size: 0.78em;
+    color: #fff;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif; 
+}
+
+.profile h4{
+    top: 8%;
+    position: absolute;
+    text-align: center;
+    align-items: center;
+    font-size: 1.2em;
+    color: #fff;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif; 
 }
