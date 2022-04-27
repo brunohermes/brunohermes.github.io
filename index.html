@@ -64,6 +64,15 @@
                 function cadastro(){
                 alert('Portfólio Acadêmico em construção! ;)');
                 }
+
+                window.onload = function () {
+                    var images = ['background.jpg', 'background2.jpg', 'background3.jpg', 'background4.jpg', 'background5.jpg', 'background6.jpg'];
+                    var image = images[Math.floor(Math.random() * images.length)];
+                    document.getElementsByTagName('body')[0].style.backgroundImage = "url('" + image + "')";
+                    document.getElementsByTagName('body')[0].style.backgroundRepeat = "no-repeat";
+                    document.getElementsByTagName('body')[0].style.backgroundSize = "cover";
+                }
+
             </script>
             
         </body>
@@ -74,4 +83,6 @@
 
         <!-- DISCLAIMER -->
 <!-- I do not own the rights on the logos or images (except the ones made by me). All rights reserved to their respective owners. -->
+
+<!-- Per aspera ad astra -->
 </html>
