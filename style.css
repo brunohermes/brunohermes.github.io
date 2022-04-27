@@ -52,8 +52,8 @@ body{
 
 }
 .container .card .content h2 {
-    position:absolute;
-    top: -30px;
+    position: relative;
+    top: -20px;
     align-items: center;
     text-align: center;
     font-size: 3.5em;
