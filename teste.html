@@ -1,237 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><script src="https://unpkg.com/scanner.js@1.2.2"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Mobile</title>
+    <title>Capturar Cupom Fiscal</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            font-family: 'Arial', sans-serif;
-            background-color: #f7f8fc;
+        body {
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
+            margin: 0;
+            background-color: #f7f8fc;
         }
-
-        .container {
+        #scanner-area, #preview-img {
+            margin-top: 20px;
             width: 100%;
             max-width: 400px;
-            padding: 20px;
         }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 16px;
-            color: #888;
-        }
-
-        .header .icon {
-            background-color: #f1f1f1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        /* Card */
-        .card {
-            background-color: #27292e;
-            border-radius: 20px;
-            padding: 20px;
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #4CAF50;
             color: white;
-            margin-bottom: 30px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .card .details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .card .details .stars {
-            display: flex;
-            align-items: center;
-        }
-
-        .card .details .stars span {
-            font-size: 20px;
-            margin-right: 5px;
-        }
-
-        .card .details .icon-mastercard {
-            font-size: 24px;
-            color: #ffae00;
-        }
-
-        /* Transactions */
-        .transactions {
-            margin-bottom: 100px;
-        }
-
-        .transactions h2 {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .transactions .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 15px;
-        }
-
-        .transactions .transaction-item .info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .transactions .transaction-item .info h3 {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .transactions .transaction-item .info span {
-            font-size: 12px;
-            color: #888;
-        }
-
-        .transactions .transaction-item .amount {
-            font-size: 16px;
-            color: #ff4c4c;
-        }
-
-        .income {
-            color: #00cc99;
-        }
-
-        .expense {
-            color: #ff4c4c;
-        }
-
-        /* Bottom navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: space-around;
-            background-color: white;
-            padding: 10px 0;
-            box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .bottom-nav button {
-            background: none;
             border: none;
-            font-size: 24px;
+            border-radius: 5px;
             cursor: pointer;
         }
-
-        .bottom-nav .add {
-            background-color: #000;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            position: relative;
-            top: -15px;
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <h1>Capturar Cupom Fiscal</h1>
 
-        <!-- Header -->
-        <div class="header">
-            <h1>Good Morning! Iqbal Hossain</h1>
-            <div class="icon">🔔</div>
-        </div>
+    <!-- Area do Scanner -->
+    <div id="scanner-area"></div>
 
-        <!-- Card -->
-        <div class="card">
-            <h2>$5480.00</h2>
-            <p>Balance</p>
-            <div class="details">
-                <div class="stars">
-                    <span>**** **** **** 402</span>
-                </div>
-                <div class="icon-mastercard">💳</div>
-            </div>
-        </div>
+    <!-- Botão para capturar a imagem -->
+    <button id="captureButton">Capturar Cupom Fiscal</button>
 
-        <!-- Transactions -->
-        <div class="transactions">
-            <h2>Transactions</h2>
+    <!-- Previsualização da imagem capturada -->
+    <img id="preview-img" src="" alt="Previsualização do cupom" style="display:none;">
 
-            <div class="transaction-item">
-                <div class="info">
-                    <h3>Income</h3>
-                    <span>+24% - 18 Sep, 2021</span>
-                </div>
-                <div class="amount income">+$145.00</div>
-            </div>
+    <!-- Formulário de upload -->
+    <form id="uploadForm" action="upload.php" method="POST" enctype="multipart/form-data" style="display:none;">
+        <input type="hidden" id="imageData" name="imageData">
+        <button type="submit">Enviar Foto</button>
+    </form>
 
-            <div class="transaction-item">
-                <div class="info">
-                    <h3>Expense</h3>
-                    <span>-42% - 18 Sep, 2021</span>
-                </div>
-                <div class="amount expense">-$46.00</div>
-            </div>
+    <!-- Incluindo Scanner.js -->
+    <script src="https://unpkg.com/scanner.js@1.2.2"></script>
 
-        </div>
-    </div>
+    <script>
+        const scanner = new Scanner();
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button>🏠</button>
-        <button>📊</button>
-        <button class="add">+</button>
-        <button>🗒</button>
-        <button>👤</button>
-    </div>
+        document.getElementById('captureButton').addEventListener('click', function() {
+            // Abre a câmera e escaneia
+            scanner.scan(displayImageOnPage, {
+                captureResolution: '1080p',
+                scannerArea: document.getElementById('scanner-area')
+            });
+        });
+
+        function displayImageOnPage(imageData) {
+            // Previsualizar a imagem capturada
+            const img = document.getElementById('preview-img');
+            img.src = imageData;
+            img.style.display = 'block';  // Mostrar a imagem capturada
+
+            // Preparar o envio da imagem para o servidor
+            const imageDataInput = document.getElementById('imageData');
+            imageDataInput.value = imageData;  // Inserir a imagem capturada no input hidden
+
+            // Mostrar o formulário para enviar a imagem
+            document.getElementById('uploadForm').style.display = 'block';
+        }
+    </script>
 
 </body>
 </html>
