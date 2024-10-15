@@ -15,11 +15,12 @@
             margin: 0;
             background-color: #f7f8fc;
         }
+
         #scanner-area {
             margin-top: 20px;
             width: 100%;
             max-width: 400px;
-            height: 300px;
+            height: 400px;
             background-color: #ddd;
             display: flex;
             align-items: center;
@@ -27,6 +28,7 @@
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+
         button {
             padding: 10px 20px;
             margin-top: 10px;
@@ -36,9 +38,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         img {
             margin-top: 20px;
             max-width: 100%;
@@ -78,7 +82,9 @@
             scanner.scan(displayImageOnPage, {
                 captureResolution: '1080p',
                 scannerArea: scannerArea,
-                onScanError: handleScanError
+                onScanError: handleScanError,
+                hideFeedback: false,  // Certifica-se de exibir o feedback da câmera
+                hideSpinner: false
             });
         });
 
@@ -92,6 +98,7 @@
         // Função de erro para caso a câmera falhe
         function handleScanError(error) {
             alert('Erro ao capturar a imagem. Verifique as permissões da câmera.');
+            console.error(error);
         }
     </script>
 
