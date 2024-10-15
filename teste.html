@@ -58,6 +58,7 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
+            display: none;
         }
 
         /* O canvas vai ocupar a tela inteira */
@@ -107,7 +108,6 @@
     <script type="text/javascript">
         let video = document.getElementById('video');
         let canvas = document.getElementById('canvasOutput');
-        let ctx = canvas.getContext('2d');
         let cameraContainer = document.getElementById('cameraContainer');
         let startButton = document.getElementById('startButton');
         let captureButton = document.getElementById('captureButton');
@@ -146,19 +146,21 @@
         function processVideo() {
             let cap = new cv.VideoCapture(video);
             let frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+            let gray = new cv.Mat();
             let edges = new cv.Mat();
 
             function detectEdges() {
                 if (!streaming) {
                     frame.delete();
+                    gray.delete();
                     edges.delete();
                     return;
                 }
 
                 cap.read(frame);  // Lê o quadro atual do vídeo
-                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
-                cv.GaussianBlur(frame, frame, new cv.Size(5, 5), 1.2, 0);  // Suavização para reduzir ruído
-                cv.Canny(frame, edges, 50, 150);  // Aplica detecção de bordas (Canny)
+                cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
+                cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 1.2, 0);  // Suavização para reduzir ruído
+                cv.Canny(gray, edges, 50, 150);  // Aplica detecção de bordas (Canny)
 
                 // Desenha a imagem com bordas detectadas no canvas
                 cv.imshow('canvasOutput', edges);
