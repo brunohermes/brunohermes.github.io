@@ -3,31 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capturar Cupom Fiscal</title>
+    <title>Captura e Detecção de Bordas - Cupom Fiscal</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            justify-content: flex-start;
+            height: 100vh;
             background-color: #f7f8fc;
             overflow: hidden;
         }
 
         #video {
-            width: 100%;
+            width: 90%;
             max-width: 400px;
+            margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
         }
 
         button {
             padding: 10px 20px;
-            margin-top: 10px;
+            margin-top: 15px;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -39,10 +44,18 @@
             background-color: #45a049;
         }
 
-        #canvas, #preview-img {
+        #canvas {
             margin-top: 20px;
-            max-width: 100%;
+            width: 90%;
+            max-width: 400px;
             height: auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #preview-img {
+            margin-top: 20px;
+            max-width: 90%;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             display: none;
@@ -51,15 +64,15 @@
 </head>
 <body>
 
-    <h1>Capturar Cupom Fiscal</h1>
+    <h1>Captura e Detecção de Bordas - Cupom Fiscal</h1>
 
-    <!-- Video stream da câmera -->
+    <!-- Vídeo ao vivo da câmera -->
     <video id="video" autoplay playsinline></video>
 
     <!-- Botão para capturar a imagem -->
     <button id="captureButton">Capturar Cupom Fiscal</button>
 
-    <!-- Canvas para processar a imagem -->
+    <!-- Canvas para aplicar detecção de bordas -->
     <canvas id="canvas"></canvas>
 
     <!-- Previsualização da imagem capturada -->
@@ -83,7 +96,7 @@
             });
         }
 
-        // Captura a imagem quando o botão é clicado
+        // Captura a imagem e aplica a detecção de bordas quando o botão é clicado
         captureButton.addEventListener('click', function() {
             // Configura o canvas com o tamanho do vídeo
             canvas.width = video.videoWidth;
@@ -93,10 +106,33 @@
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Converte o canvas para data URL e exibe no elemento <img>
-            const imageData = canvas.toDataURL('image/png');
-            previewImg.src = imageData;
-            previewImg.style.display = 'block'; // Mostra a imagem capturada
+            // Aplicando detecção de bordas manualmente
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // Converte para tons de cinza e aplica um simples filtro de bordas
+            for (let i = 0; i < data.length; i += 4) {
+                // Convertendo o pixel para tons de cinza
+                const gray = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+                data[i] = gray;
+                data[i + 1] = gray;
+                data[i + 2] = gray;
+
+                // Aplicando um simples filtro de detecção de bordas
+                if (gray < 128) {
+                    data[i] = data[i + 1] = data[i + 2] = 0; // Preto
+                } else {
+                    data[i] = data[i + 1] = data[i + 2] = 255; // Branco
+                }
+            }
+
+            // Atualiza a imagem no canvas com o efeito aplicado
+            context.putImageData(imageData, 0, 0);
+
+            // Converte o canvas para uma imagem base64 e exibe na previsualização
+            const imgData = canvas.toDataURL('image/png');
+            previewImg.src = imgData;
+            previewImg.style.display = 'block';
         });
 
         // Iniciar a câmera ao carregar a página
