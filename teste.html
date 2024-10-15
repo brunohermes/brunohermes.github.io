@@ -14,19 +14,15 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f7f8fc;
+            overflow: hidden;
         }
 
-        #scanner-area {
-            margin-top: 20px;
+        #video {
             width: 100%;
             max-width: 400px;
-            height: 400px;
-            background-color: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         button {
@@ -43,12 +39,13 @@
             background-color: #45a049;
         }
 
-        img {
+        #canvas, #preview-img {
             margin-top: 20px;
             max-width: 100%;
             height: auto;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
         }
     </style>
 </head>
@@ -56,50 +53,54 @@
 
     <h1>Capturar Cupom Fiscal</h1>
 
-    <!-- Área do Scanner -->
-    <div id="scanner-area">
-        <p>Câmera será exibida aqui</p>
-    </div>
+    <!-- Video stream da câmera -->
+    <video id="video" autoplay playsinline></video>
 
     <!-- Botão para capturar a imagem -->
     <button id="captureButton">Capturar Cupom Fiscal</button>
 
-    <!-- Previsualização da imagem capturada -->
-    <img id="preview-img" src="" alt="Imagem do cupom fiscal" style="display:none;">
+    <!-- Canvas para processar a imagem -->
+    <canvas id="canvas"></canvas>
 
-    <!-- Incluindo Scanner.js -->
-    <script src="https://unpkg.com/scanner.js@1.2.2"></script>
+    <!-- Previsualização da imagem capturada -->
+    <img id="preview-img" src="" alt="Imagem do cupom fiscal">
 
     <script>
-        const scanner = new Scanner();
-        const scannerArea = document.getElementById('scanner-area');
-        const previewImg = document.getElementById('preview-img');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
         const captureButton = document.getElementById('captureButton');
+        const previewImg = document.getElementById('preview-img');
 
-        // Função para capturar a imagem do cupom fiscal
-        captureButton.addEventListener('click', function() {
-            // Abre a câmera e escaneia a imagem
-            scanner.scan(displayImageOnPage, {
-                captureResolution: '1080p',
-                scannerArea: scannerArea,
-                onScanError: handleScanError,
-                hideFeedback: false,  // Certifica-se de exibir o feedback da câmera
-                hideSpinner: false
+        // Função para iniciar a câmera do dispositivo móvel
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(function(stream) {
+                video.srcObject = stream;
+            })
+            .catch(function(err) {
+                console.error("Erro ao acessar a câmera: ", err);
+                alert("Erro ao acessar a câmera. Verifique se você concedeu permissão para o navegador.");
             });
+        }
+
+        // Captura a imagem quando o botão é clicado
+        captureButton.addEventListener('click', function() {
+            // Configura o canvas com o tamanho do vídeo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Desenha o frame atual do vídeo no canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Converte o canvas para data URL e exibe no elemento <img>
+            const imageData = canvas.toDataURL('image/png');
+            previewImg.src = imageData;
+            previewImg.style.display = 'block'; // Mostra a imagem capturada
         });
 
-        // Função de callback para exibir a imagem capturada
-        function displayImageOnPage(imageData) {
-            // Definir a imagem capturada no elemento img
-            previewImg.src = imageData;
-            previewImg.style.display = 'block';  // Exibe a imagem capturada
-        }
-
-        // Função de erro para caso a câmera falhe
-        function handleScanError(error) {
-            alert('Erro ao capturar a imagem. Verifique as permissões da câmera.');
-            console.error(error);
-        }
+        // Iniciar a câmera ao carregar a página
+        window.addEventListener('load', startCamera);
     </script>
 
 </body>
