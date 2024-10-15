@@ -27,7 +27,16 @@
             background-color: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        #startButton, #captureButton {
+        #startButton {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        #startButton img {
+            width: 80px;
+            height: 80px;
+        }
+        #captureButton {
             padding: 10px 20px;
             font-size: 16px;
             background-color: #4CAF50;
@@ -35,10 +44,10 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-top: 10px;
             transition: background-color 0.3s;
         }
-        #startButton:hover, #captureButton:hover {
+        #captureButton:hover {
             background-color: #45a049;
         }
         video {
@@ -54,7 +63,9 @@
 </head>
 <body>
 
-    <button id="startButton">Abrir Câmera</button>
+    <button id="startButton">
+        <img src="https://img.icons8.com/ios-filled/50/000000/camera--v1.png" alt="Ícone da Câmera"/>
+    </button>
 
     <div id="cameraContainer">
         <video id="video" autoplay></video>
@@ -62,8 +73,8 @@
         <button id="captureButton">Capturar Foto</button>
     </div>
 
-    <!-- Incluindo a biblioteca tracking.js -->
-    <script src="https://cdn.jsdelivr.net/npm/tracking/build/tracking-min.js"></script>
+    <!-- Incluindo a biblioteca OpenCV.js -->
+    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
 
     <script type="text/javascript">
         let video = document.getElementById('video');
@@ -72,13 +83,18 @@
         let cameraContainer = document.getElementById('cameraContainer');
         let startButton = document.getElementById('startButton');
         let captureButton = document.getElementById('captureButton');
+        let streaming = false;
 
-        // Função chamada ao clicar no botão "Abrir Câmera"
-        startButton.addEventListener('click', startCamera);
+        // Função chamada ao carregar OpenCV.js
+        function onOpenCvReady() {
+            console.log('OpenCV.js está pronto');
+            startButton.addEventListener('click', startCamera);
+            captureButton.addEventListener('click', capturePhoto);
+        }
 
         // Função para iniciar a câmera e aplicar detecção de bordas
         function startCamera() {
-            startButton.style.display = 'none';  // Esconde o botão de iniciar
+            startButton.style.display = 'none';  // Esconde o ícone de câmera
             cameraContainer.style.display = 'flex';  // Exibe o container da câmera
 
             // Solicita permissão para acessar a câmera traseira
@@ -89,6 +105,7 @@
                     video.addEventListener('loadedmetadata', function() {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
+                        streaming = true;
                         processVideo();  // Inicia o processamento de vídeo com detecção de bordas
                     });
                 })
@@ -97,23 +114,28 @@
                 });
         }
 
-        // Função para processar o vídeo e aplicar detecção de bordas com tracking.js
+        // Função para processar o vídeo e aplicar detecção de bordas com OpenCV.js
         function processVideo() {
+            let cap = new cv.VideoCapture(video);
+            let frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+            let edges = new cv.Mat();
+
             function detectEdges() {
-                // Desenhar o vídeo no canvas
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                if (!streaming) {
+                    frame.delete();
+                    edges.delete();
+                    return;
+                }
 
-                // Pega os dados da imagem
-                let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                cap.read(frame);  // Lê o quadro atual do vídeo
+                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
+                cv.GaussianBlur(frame, frame, new cv.Size(5, 5), 1.2, 0);  // Suavização para reduzir ruído
+                cv.Canny(frame, edges, 50, 150);  // Aplica detecção de bordas (Canny)
 
-                // Detecção de bordas com tracking.js
-                tracking.Image.grayscale(imageData.data, canvas.width, canvas.height); // Converte para tons de cinza
-                tracking.Image.sobel(imageData.data, canvas.width, canvas.height); // Aplica detecção de bordas
+                // Desenha a imagem com bordas detectadas no canvas
+                cv.imshow('canvasOutput', edges);
 
-                // Atualiza a imagem processada no canvas
-                ctx.putImageData(imageData, 0, 0);
-
-                // Chamar continuamente a função para atualizar o feed com a detecção de bordas
+                // Chama a função continuamente para aplicar detecção de bordas em tempo real
                 requestAnimationFrame(detectEdges);
             }
 
@@ -121,14 +143,13 @@
         }
 
         // Função para capturar a imagem do canvas
-        captureButton.addEventListener('click', function() {
+        function capturePhoto() {
             let dataURL = canvas.toDataURL('image/png');  // Converte a imagem do canvas para base64
             let link = document.createElement('a');
             link.href = dataURL;
             link.download = 'captura.png';  // Define o nome do arquivo a ser salvo
             link.click();  // Simula o clique para baixar a imagem
-        });
-
+        }
     </script>
 
 </body>
