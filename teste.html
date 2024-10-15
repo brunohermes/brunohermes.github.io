@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Bordas Responsiva - Cupom Fiscal</title>
+    <title>Detecção de Bordas - Captura de Cupom Fiscal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
@@ -26,7 +27,7 @@
             background-color: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        #startButton {
+        #startButton, #captureButton {
             padding: 10px 20px;
             font-size: 16px;
             background-color: #4CAF50;
@@ -34,9 +35,10 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-bottom: 10px;
             transition: background-color 0.3s;
         }
-        #startButton:hover {
+        #startButton:hover, #captureButton:hover {
             background-color: #45a049;
         }
         video {
@@ -60,6 +62,7 @@
     <div id="cameraContainer">
         <video id="video" autoplay></video>
         <canvas id="canvasOutput"></canvas>
+        <button id="captureButton">Capturar Foto</button>
     </div>
 
     <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
@@ -70,25 +73,26 @@
         let ctx = canvas.getContext('2d');
         let cameraContainer = document.getElementById('cameraContainer');
         let startButton = document.getElementById('startButton');
+        let captureButton = document.getElementById('captureButton');
 
         // Função chamada quando OpenCV.js estiver pronto
         function onOpenCvReady() {
             console.log('OpenCV.js is ready');
             startButton.addEventListener('click', startCamera);
+            captureButton.addEventListener('click', capturePhoto);
         }
 
         // Função para iniciar a câmera e aplicar detecção de bordas
         function startCamera() {
-            // Esconder o botão de iniciar e exibir o container da câmera
-            startButton.style.display = 'none';
-            cameraContainer.style.display = 'flex';
+            startButton.style.display = 'none';  // Esconde o botão de iniciar
+            cameraContainer.style.display = 'flex';  // Exibe o container da câmera
 
-            // Solicitar permissão para acessar a câmera traseira
+            // Solicita permissão para acessar a câmera traseira
             navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
                 .then(function (stream) {
                     video.srcObject = stream;
-                    video.style.display = 'block'; // Exibe o vídeo
-                    processVideo(); // Inicia o processamento de vídeo
+                    video.style.display = 'block';  // Exibe o feed de vídeo
+                    processVideo();  // Inicia o processamento de vídeo com detecção de bordas
                 })
                 .catch(function (err) {
                     console.error("Erro ao acessar a câmera traseira: ", err);
@@ -102,9 +106,9 @@
             let edges = new cv.Mat();
 
             function detectEdges() {
-                cap.read(frame); // Lê o quadro atual do vídeo
-                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY); // Converte para tons de cinza
-                cv.Canny(frame, edges, 50, 150); // Aplica detecção de bordas
+                cap.read(frame);  // Lê o quadro atual do vídeo
+                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
+                cv.Canny(frame, edges, 50, 150);  // Aplica detecção de bordas
 
                 // Redimensiona o canvas para corresponder ao vídeo
                 canvas.width = video.videoWidth;
@@ -117,7 +121,16 @@
                 requestAnimationFrame(detectEdges);
             }
 
-            detectEdges(); // Inicia a detecção de bordas
+            detectEdges();  // Inicia a detecção de bordas
+        }
+
+        // Função para capturar a imagem do canvas
+        function capturePhoto() {
+            let dataURL = canvas.toDataURL('image/png');  // Converte a imagem do canvas para base64
+            let link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'captura.png';  // Define o nome do arquivo a ser salvo
+            link.click();  // Simula o clique para baixar a imagem
         }
     </script>
 
