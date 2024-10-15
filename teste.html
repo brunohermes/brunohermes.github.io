@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detecção de Bordas - Cupom Fiscal (Câmera Traseira)</title>
     <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 
-    <title>Detecção de Bordas - Cupom Fiscal</title>
     <style>
         video, canvas {
             display: block;
@@ -29,7 +29,7 @@
     </style>
 </head>
 <body>
-    <h1>Detecção de Bordas - Cupom Fiscal</h1>
+    <h1>Detecção de Bordas - Cupom Fiscal (Câmera Traseira)</h1>
     <video id="video" width="640" height="480" autoplay></video>
     <canvas id="canvasOutput" width="640" height="480"></canvas>
     <div class="frame"></div>
@@ -48,14 +48,14 @@
         }
 
         function startCamera() {
-            // Solicita permissão para acessar a câmera
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Solicita permissão para acessar a câmera traseira
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
                 .then(function (stream) {
                     video.srcObject = stream;
                     processVideo(); // Inicia o processamento de vídeo
                 })
                 .catch(function (err) {
-                    console.error("Erro ao acessar a câmera: ", err);
+                    console.error("Erro ao acessar a câmera traseira: ", err);
                 });
         }
 
