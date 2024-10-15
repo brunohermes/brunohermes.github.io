@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Bordas - Captura de Cupom Fiscal</title>
+    <title>Detecção de Bordas - Cupom Fiscal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,9 +42,6 @@
             background-color: #45a049;
         }
         video {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
             display: none;
         }
         canvas {
@@ -75,6 +72,9 @@
         let startButton = document.getElementById('startButton');
         let captureButton = document.getElementById('captureButton');
 
+        // Variáveis OpenCV
+        let frame, cap, edges;
+
         // Função chamada quando OpenCV.js estiver pronto
         function onOpenCvReady() {
             console.log('OpenCV.js is ready');
@@ -92,7 +92,11 @@
                 .then(function (stream) {
                     video.srcObject = stream;
                     video.style.display = 'block';  // Exibe o feed de vídeo
-                    processVideo();  // Inicia o processamento de vídeo com detecção de bordas
+                    video.addEventListener('loadedmetadata', function() {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        processVideo();  // Inicia o processamento de vídeo com detecção de bordas
+                    });
                 })
                 .catch(function (err) {
                     console.error("Erro ao acessar a câmera traseira: ", err);
@@ -101,20 +105,17 @@
 
         // Função para processar o vídeo e aplicar detecção de bordas
         function processVideo() {
-            let cap = new cv.VideoCapture(video);
-            let frame = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-            let edges = new cv.Mat();
+            // Inicializa objetos OpenCV
+            cap = new cv.VideoCapture(video);
+            frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+            edges = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
 
             function detectEdges() {
                 cap.read(frame);  // Lê o quadro atual do vídeo
                 cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
                 cv.Canny(frame, edges, 50, 150);  // Aplica detecção de bordas
 
-                // Redimensiona o canvas para corresponder ao vídeo
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                // Desenha a imagem com bordas detectadas no canvas
+                // Desenha o resultado no canvas
                 cv.imshow('canvasOutput', edges);
 
                 // Chama a função continuamente para aplicar detecção de bordas em tempo real
