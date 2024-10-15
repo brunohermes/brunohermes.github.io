@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><script src="https://unpkg.com/scanner.js@1.2.2"></script>
-
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capturar Cupom Fiscal</title>
     <style>
@@ -16,10 +15,17 @@
             margin: 0;
             background-color: #f7f8fc;
         }
-        #scanner-area, #preview-img {
+        #scanner-area {
             margin-top: 20px;
             width: 100%;
             max-width: 400px;
+            height: 300px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         button {
             padding: 10px 20px;
@@ -33,53 +39,59 @@
         button:hover {
             background-color: #45a049;
         }
+        img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
 
     <h1>Capturar Cupom Fiscal</h1>
 
-    <!-- Area do Scanner -->
-    <div id="scanner-area"></div>
+    <!-- Área do Scanner -->
+    <div id="scanner-area">
+        <p>Câmera será exibida aqui</p>
+    </div>
 
     <!-- Botão para capturar a imagem -->
     <button id="captureButton">Capturar Cupom Fiscal</button>
 
     <!-- Previsualização da imagem capturada -->
-    <img id="preview-img" src="" alt="Previsualização do cupom" style="display:none;">
-
-    <!-- Formulário de upload -->
-    <form id="uploadForm" action="upload.php" method="POST" enctype="multipart/form-data" style="display:none;">
-        <input type="hidden" id="imageData" name="imageData">
-        <button type="submit">Enviar Foto</button>
-    </form>
+    <img id="preview-img" src="" alt="Imagem do cupom fiscal" style="display:none;">
 
     <!-- Incluindo Scanner.js -->
     <script src="https://unpkg.com/scanner.js@1.2.2"></script>
 
     <script>
         const scanner = new Scanner();
+        const scannerArea = document.getElementById('scanner-area');
+        const previewImg = document.getElementById('preview-img');
+        const captureButton = document.getElementById('captureButton');
 
-        document.getElementById('captureButton').addEventListener('click', function() {
-            // Abre a câmera e escaneia
+        // Função para capturar a imagem do cupom fiscal
+        captureButton.addEventListener('click', function() {
+            // Abre a câmera e escaneia a imagem
             scanner.scan(displayImageOnPage, {
                 captureResolution: '1080p',
-                scannerArea: document.getElementById('scanner-area')
+                scannerArea: scannerArea,
+                onScanError: handleScanError
             });
         });
 
+        // Função de callback para exibir a imagem capturada
         function displayImageOnPage(imageData) {
-            // Previsualizar a imagem capturada
-            const img = document.getElementById('preview-img');
-            img.src = imageData;
-            img.style.display = 'block';  // Mostrar a imagem capturada
+            // Definir a imagem capturada no elemento img
+            previewImg.src = imageData;
+            previewImg.style.display = 'block';  // Exibe a imagem capturada
+        }
 
-            // Preparar o envio da imagem para o servidor
-            const imageDataInput = document.getElementById('imageData');
-            imageDataInput.value = imageData;  // Inserir a imagem capturada no input hidden
-
-            // Mostrar o formulário para enviar a imagem
-            document.getElementById('uploadForm').style.display = 'block';
+        // Função de erro para caso a câmera falhe
+        function handleScanError(error) {
+            alert('Erro ao capturar a imagem. Verifique as permissões da câmera.');
         }
     </script>
 
