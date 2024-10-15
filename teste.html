@@ -3,184 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Bordas - Cupom Fiscal</title>
+    <title>Interface Mobile</title>
     <style>
-        /* Reseta o estilo padrão do navegador */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Estilo geral da página */
         body, html {
-            height: 100%;
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f8fc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .header .icon {
+            background-color: #f1f1f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            overflow: hidden;
+            font-size: 24px;
+            cursor: pointer;
         }
 
-        /* Ícone de câmera inicial */
-        #startButton {
+        /* Card */
+        .card {
+            background-color: #27292e;
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .card .details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .card .details .stars {
+            display: flex;
+            align-items: center;
+        }
+
+        .card .details .stars span {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+
+        .card .details .icon-mastercard {
+            font-size: 24px;
+            color: #ffae00;
+        }
+
+        /* Transactions */
+        .transactions {
+            margin-bottom: 100px;
+        }
+
+        .transactions h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .transactions .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+
+        .transactions .transaction-item .info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transactions .transaction-item .info h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .transactions .transaction-item .info span {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .transactions .transaction-item .amount {
+            font-size: 16px;
+            color: #ff4c4c;
+        }
+
+        .income {
+            color: #00cc99;
+        }
+
+        .expense {
+            color: #ff4c4c;
+        }
+
+        /* Bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-around;
+            background-color: white;
+            padding: 10px 0;
+            box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-nav button {
             background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
 
-        /* Ícone de câmera */
-        #startButton img {
-            width: 80px;
-            height: 80px;
-        }
-
-        /* Container da câmera (vai ocupar a tela inteira) */
-        #cameraContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            display: none;
+        .bottom-nav .add {
+            background-color: #000;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
             justify-content: center;
             align-items: center;
-            background-color: black;
-        }
-
-        /* O vídeo vai ocupar a tela inteira */
-        video {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            display: none;
-        }
-
-        /* O canvas vai ocupar a tela inteira */
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-        }
-
-        /* Botão de capturar a imagem */
-        #captureButton {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 10;
+            font-size: 30px;
+            position: relative;
+            top: -15px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Ícone de câmera para iniciar -->
-    <button id="startButton">
-        <img src="https://img.icons8.com/ios-filled/50/000000/camera--v1.png" alt="Ícone da Câmera"/>
-    </button>
+    <div class="container">
 
-    <!-- Container da câmera e detecção -->
-    <div id="cameraContainer">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvasOutput"></canvas>
-        <button id="captureButton">Capturar Foto</button>
+        <!-- Header -->
+        <div class="header">
+            <h1>Good Morning! Iqbal Hossain</h1>
+            <div class="icon">🔔</div>
+        </div>
+
+        <!-- Card -->
+        <div class="card">
+            <h2>$5480.00</h2>
+            <p>Balance</p>
+            <div class="details">
+                <div class="stars">
+                    <span>**** **** **** 402</span>
+                </div>
+                <div class="icon-mastercard">💳</div>
+            </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="transactions">
+            <h2>Transactions</h2>
+
+            <div class="transaction-item">
+                <div class="info">
+                    <h3>Income</h3>
+                    <span>+24% - 18 Sep, 2021</span>
+                </div>
+                <div class="amount income">+$145.00</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="info">
+                    <h3>Expense</h3>
+                    <span>-42% - 18 Sep, 2021</span>
+                </div>
+                <div class="amount expense">-$46.00</div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Incluindo a biblioteca OpenCV.js -->
-    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
-
-    <script type="text/javascript">
-        let video = document.getElementById('video');
-        let canvas = document.getElementById('canvasOutput');
-        let cameraContainer = document.getElementById('cameraContainer');
-        let startButton = document.getElementById('startButton');
-        let captureButton = document.getElementById('captureButton');
-        let streaming = false;
-
-        // Função chamada ao carregar OpenCV.js
-        function onOpenCvReady() {
-            console.log('OpenCV.js está pronto');
-            startButton.addEventListener('click', startCamera);
-            captureButton.addEventListener('click', capturePhoto);
-        }
-
-        // Função para iniciar a câmera e aplicar detecção de bordas
-        function startCamera() {
-            startButton.style.display = 'none';  // Esconde o ícone de câmera
-            cameraContainer.style.display = 'flex';  // Exibe o container da câmera
-
-            // Solicita permissão para acessar a câmera traseira
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                    video.style.display = 'block';  // Exibe o feed de vídeo
-                    video.addEventListener('loadedmetadata', function() {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        streaming = true;
-                        processVideo();  // Inicia o processamento de vídeo com detecção de bordas
-                    });
-                })
-                .catch(function (err) {
-                    console.error("Erro ao acessar a câmera traseira: ", err);
-                });
-        }
-
-        // Função para processar o vídeo e aplicar detecção de bordas com OpenCV.js
-        function processVideo() {
-            let cap = new cv.VideoCapture(video);
-            let frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-            let gray = new cv.Mat();
-            let edges = new cv.Mat();
-
-            function detectEdges() {
-                if (!streaming) {
-                    frame.delete();
-                    gray.delete();
-                    edges.delete();
-                    return;
-                }
-
-                cap.read(frame);  // Lê o quadro atual do vídeo
-                cv.cvtColor(frame, gray, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
-                cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 1.2, 0);  // Suavização para reduzir ruído
-                cv.Canny(gray, edges, 50, 150);  // Aplica detecção de bordas (Canny)
-
-                // Desenha a imagem com bordas detectadas no canvas
-                cv.imshow('canvasOutput', edges);
-
-                // Chama a função continuamente para aplicar detecção de bordas em tempo real
-                requestAnimationFrame(detectEdges);
-            }
-
-            detectEdges();  // Inicia a detecção de bordas
-        }
-
-        // Função para capturar a imagem do canvas
-        function capturePhoto() {
-            let dataURL = canvas.toDataURL('image/png');  // Converte a imagem do canvas para base64
-            let link = document.createElement('a');
-            link.href = dataURL;
-            link.download = 'captura.png';  // Define o nome do arquivo a ser salvo
-            link.click();  // Simula o clique para baixar a imagem
-        }
-    </script>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button>🏠</button>
+        <button>📊</button>
+        <button class="add">+</button>
+        <button>🗒</button>
+        <button>👤</button>
+    </div>
 
 </body>
 </html>
