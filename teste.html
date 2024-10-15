@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Bordas - Cupom Fiscal</title>
+    <title>Detecção de Bordas - Usando Canny Edge Detector</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,7 +62,8 @@
         <button id="captureButton">Capturar Foto</button>
     </div>
 
-    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+    <!-- Incluindo a biblioteca js-canny-edge-detector -->
+    <script src="https://cdn.jsdelivr.net/gh/petarjs/js-canny-edge-detector/canny.js"></script>
 
     <script type="text/javascript">
         let video = document.getElementById('video');
@@ -72,15 +73,8 @@
         let startButton = document.getElementById('startButton');
         let captureButton = document.getElementById('captureButton');
 
-        // Variáveis OpenCV
-        let frame, cap, edges;
-
-        // Função chamada quando OpenCV.js estiver pronto
-        function onOpenCvReady() {
-            console.log('OpenCV.js is ready');
-            startButton.addEventListener('click', startCamera);
-            captureButton.addEventListener('click', capturePhoto);
-        }
+        // Função chamada ao clicar no botão "Abrir Câmera"
+        startButton.addEventListener('click', startCamera);
 
         // Função para iniciar a câmera e aplicar detecção de bordas
         function startCamera() {
@@ -103,22 +97,26 @@
                 });
         }
 
-        // Função para processar o vídeo e aplicar detecção de bordas
+        // Função para processar o vídeo e aplicar detecção de bordas com js-canny-edge-detector
         function processVideo() {
-            // Inicializa objetos OpenCV
-            cap = new cv.VideoCapture(video);
-            frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
-            edges = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC1);
-
             function detectEdges() {
-                cap.read(frame);  // Lê o quadro atual do vídeo
-                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);  // Converte para tons de cinza
-                cv.Canny(frame, edges, 50, 150);  // Aplica detecção de bordas
+                // Desenhar o vídeo no canvas
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                // Desenha o resultado no canvas
-                cv.imshow('canvasOutput', edges);
+                // Pega os dados da imagem
+                let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-                // Chama a função continuamente para aplicar detecção de bordas em tempo real
+                // Aplicar a detecção de bordas usando a função do canny-edge-detector
+                let edgeData = CannyJS.cannyEdgeDetector(imageData, {
+                    lowThreshold: 50,
+                    highThreshold: 150,
+                    gaussianBlur: 1.1
+                });
+
+                // Limpar o canvas e desenhar as bordas detectadas
+                ctx.putImageData(edgeData, 0, 0);
+
+                // Chamar continuamente a função para atualizar o feed com a detecção de bordas
                 requestAnimationFrame(detectEdges);
             }
 
@@ -126,13 +124,14 @@
         }
 
         // Função para capturar a imagem do canvas
-        function capturePhoto() {
+        captureButton.addEventListener('click', function() {
             let dataURL = canvas.toDataURL('image/png');  // Converte a imagem do canvas para base64
             let link = document.createElement('a');
             link.href = dataURL;
             link.download = 'captura.png';  // Define o nome do arquivo a ser salvo
             link.click();  // Simula o clique para baixar a imagem
-        }
+        });
+
     </script>
 
 </body>
