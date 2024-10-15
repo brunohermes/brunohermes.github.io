@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+
+    <title>Detecção de Bordas - Cupom Fiscal</title>
+    <style>
+        video, canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        #canvasOutput {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 40%;
+            border: 5px solid rgba(0, 255, 0, 0.7);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Detecção de Bordas - Cupom Fiscal</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvasOutput" width="640" height="480"></canvas>
+    <div class="frame"></div>
+
+    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvasOutput');
+        let ctx = canvas.getContext('2d');
+
+        // Função chamada quando OpenCV.js estiver pronto
+        function onOpenCvReady() {
+            console.log('OpenCV.js is ready');
+            startCamera();
+        }
+
+        function startCamera() {
+            // Solicita permissão para acessar a câmera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    processVideo(); // Inicia o processamento de vídeo
+                })
+                .catch(function (err) {
+                    console.error("Erro ao acessar a câmera: ", err);
+                });
+        }
+
+        function processVideo() {
+            // Carregar o vídeo no OpenCV
+            let cap = new cv.VideoCapture(video);
+
+            let frame = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+            let edges = new cv.Mat();
+
+            function detectEdges() {
+                cap.read(frame); // Lê o quadro atual do vídeo
+                cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY); // Converte para tons de cinza
+                cv.Canny(frame, edges, 50, 150); // Aplica detecção de bordas
+
+                // Desenha a imagem com bordas detectadas no canvas
+                cv.imshow('canvasOutput', edges);
+
+                // Chama a função continuamente
+                requestAnimationFrame(detectEdges);
+            }
+
+            // Inicia a detecção de bordas
+            detectEdges();
+        }
+    </script>
+</body>
+</html>
