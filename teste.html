@@ -62,8 +62,8 @@
         <button id="captureButton">Capturar Foto</button>
     </div>
 
-    <!-- Incluindo a biblioteca js-canny-edge-detector -->
-    <script src="https://cdn.jsdelivr.net/gh/petarjs/js-canny-edge-detector/canny.js"></script>
+    <!-- Incluindo a biblioteca tracking.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tracking/build/tracking-min.js"></script>
 
     <script type="text/javascript">
         let video = document.getElementById('video');
@@ -97,7 +97,7 @@
                 });
         }
 
-        // Função para processar o vídeo e aplicar detecção de bordas com js-canny-edge-detector
+        // Função para processar o vídeo e aplicar detecção de bordas com tracking.js
         function processVideo() {
             function detectEdges() {
                 // Desenhar o vídeo no canvas
@@ -106,15 +106,12 @@
                 // Pega os dados da imagem
                 let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-                // Aplicar a detecção de bordas usando a função do canny-edge-detector
-                let edgeData = CannyJS.cannyEdgeDetector(imageData, {
-                    lowThreshold: 50,
-                    highThreshold: 150,
-                    gaussianBlur: 1.2
-                });
+                // Detecção de bordas com tracking.js
+                tracking.Image.grayscale(imageData.data, canvas.width, canvas.height); // Converte para tons de cinza
+                tracking.Image.sobel(imageData.data, canvas.width, canvas.height); // Aplica detecção de bordas
 
-                // Limpar o canvas e desenhar as bordas detectadas
-                ctx.putImageData(edgeData, 0, 0);
+                // Atualiza a imagem processada no canvas
+                ctx.putImageData(imageData, 0, 0);
 
                 // Chamar continuamente a função para atualizar o feed com a detecção de bordas
                 requestAnimationFrame(detectEdges);
