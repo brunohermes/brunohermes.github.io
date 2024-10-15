@@ -3,55 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Bordas - Cupom Fiscal (Câmera Traseira)</title>
-    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
-
+    <title>Detecção de Bordas Responsiva - Cupom Fiscal</title>
     <style>
-        video, canvas {
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #cameraContainer {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            padding: 10px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #startButton:hover {
+            background-color: #45a049;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: none;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
             display: block;
-            margin: 0 auto;
-        }
-        #canvasOutput {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        .frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 80%;
-            height: 40%;
-            border: 5px solid rgba(0, 255, 0, 0.7);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <h1>Detecção de Bordas - Cupom Fiscal (Câmera Traseira)</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="canvasOutput" width="640" height="480"></canvas>
-    <div class="frame"></div>
+
+    <button id="startButton">Abrir Câmera</button>
+
+    <div id="cameraContainer">
+        <video id="video" autoplay></video>
+        <canvas id="canvasOutput"></canvas>
+    </div>
 
     <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
-    
+
     <script type="text/javascript">
         let video = document.getElementById('video');
         let canvas = document.getElementById('canvasOutput');
         let ctx = canvas.getContext('2d');
+        let cameraContainer = document.getElementById('cameraContainer');
+        let startButton = document.getElementById('startButton');
 
         // Função chamada quando OpenCV.js estiver pronto
         function onOpenCvReady() {
             console.log('OpenCV.js is ready');
-            startCamera();
+            startButton.addEventListener('click', startCamera);
         }
 
+        // Função para iniciar a câmera e aplicar detecção de bordas
         function startCamera() {
-            // Solicita permissão para acessar a câmera traseira
+            // Esconder o botão de iniciar e exibir o container da câmera
+            startButton.style.display = 'none';
+            cameraContainer.style.display = 'flex';
+
+            // Solicitar permissão para acessar a câmera traseira
             navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
                 .then(function (stream) {
                     video.srcObject = stream;
+                    video.style.display = 'block'; // Exibe o vídeo
                     processVideo(); // Inicia o processamento de vídeo
                 })
                 .catch(function (err) {
@@ -59,10 +95,9 @@
                 });
         }
 
+        // Função para processar o vídeo e aplicar detecção de bordas
         function processVideo() {
-            // Carregar o vídeo no OpenCV
             let cap = new cv.VideoCapture(video);
-
             let frame = new cv.Mat(video.height, video.width, cv.CV_8UC4);
             let edges = new cv.Mat();
 
@@ -71,16 +106,20 @@
                 cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY); // Converte para tons de cinza
                 cv.Canny(frame, edges, 50, 150); // Aplica detecção de bordas
 
+                // Redimensiona o canvas para corresponder ao vídeo
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
                 // Desenha a imagem com bordas detectadas no canvas
                 cv.imshow('canvasOutput', edges);
 
-                // Chama a função continuamente
+                // Chama a função continuamente para aplicar detecção de bordas em tempo real
                 requestAnimationFrame(detectEdges);
             }
 
-            // Inicia a detecção de bordas
-            detectEdges();
+            detectEdges(); // Inicia a detecção de bordas
         }
     </script>
+
 </body>
 </html>
