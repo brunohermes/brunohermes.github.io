@@ -4,11 +4,10 @@ self.addEventListener('install', function(event) {
         caches.open('app-cache').then(function(cache) {
             return cache.addAll([
                 '/index.html',
-                '/camera.html',
-                '/submit.html',
+                '/manifest.json',
                 '/icons/icon-192x192.png',
                 '/icons/icon-512x512.png',
-                // Outros arquivos necessários
+                // Adicione outros arquivos que você quer cachear
             ]);
         })
     );
