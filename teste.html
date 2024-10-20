@@ -1,141 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção em Tempo Real - Cupom Fiscal</title>
+    <title>Capturar Foto</title>
     <style>
-        * {
+        body, html {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            font-family: Arial, sans-serif;
+            height: 100%;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            background-color: #f7f8fc;
-            overflow: hidden;
+            flex-direction: column;
+            background-color: #000;
         }
 
-        #video, #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
-        #captureButton {
+        .capture-btn {
             position: absolute;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
+            padding: 15px 30px;
+            font-size: 18px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
-            z-index: 10;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .capture-btn:hover {
+            background-color: #0056b3;
+        }
+
+        canvas {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Vídeo ao vivo da câmera -->
-    <video id="video" autoplay playsinline></video>
-
-    <!-- Canvas para renderizar bordas em tempo real -->
-    <canvas id="canvas"></canvas>
-
-    <!-- Botão para capturar a imagem final -->
-    <button id="captureButton">Capturar Imagem</button>
+    <video id="camera" autoplay playsinline></video>
+    <canvas id="photoCanvas"></canvas>
+    <button class="capture-btn" id="captureButton">Tirar Foto</button>
 
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('photoCanvas');
         const captureButton = document.getElementById('captureButton');
-        const context = canvas.getContext('2d');
 
-        // Função para iniciar a câmera do dispositivo móvel
-        function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(function(stream) {
+        // Acessar a câmera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
                 video.srcObject = stream;
-                video.play();
-                processVideo();
             })
-            .catch(function(err) {
+            .catch(err => {
                 console.error("Erro ao acessar a câmera: ", err);
-                alert("Erro ao acessar a câmera. Verifique se você concedeu permissão para o navegador.");
             });
-        }
 
-        // Processamento de vídeo em tempo real
-        function processVideo() {
+        // Tirar foto
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-
-            // Função de processamento contínuo do vídeo
-            function detectEdges() {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Aplicar um filtro de detecção de bordas simples
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imageData.data;
-
-                // Converte para tons de cinza e aplica uma detecção de bordas simples
-                for (let i = 0; i < data.length; i += 4) {
-                    const gray = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
-                    data[i] = data[i + 1] = data[i + 2] = gray < 128 ? 0 : 255;
-                }
-
-                context.putImageData(imageData, 0, 0);
-
-                // Desenhar um retângulo ao redor do papel (simulado)
-                const rectWidth = canvas.width * 0.6;
-                const rectHeight = canvas.height * 0.3;
-                const rectX = (canvas.width - rectWidth) / 2;
-                const rectY = (canvas.height - rectHeight) / 2;
-
-                context.beginPath();
-                context.lineWidth = 4;
-                context.strokeStyle = "lime";
-                context.rect(rectX, rectY, rectWidth, rectHeight);
-                context.stroke();
-
-                // Continuar o processamento em tempo real
-                requestAnimationFrame(detectEdges);
-            }
-
-            detectEdges();
-        }
-
-        // Captura a imagem quando o botão é clicado
-        captureButton.addEventListener('click', function() {
-            // Desenha o frame atual do vídeo no canvas para captura final
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Converter o canvas para uma imagem
-            const imageData = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = imageData;
-            link.download = 'captura.png';
-            link.click(); // Baixar a imagem capturada
-        });
+            // Converter a foto em dados de URL base64
+            const photoData = canvas.toDataURL('image/png');
+            localStorage.setItem('photo', photoData);  // Armazena a foto no localStorage
 
-        // Iniciar a câmera ao carregar a página
-        window.addEventListener('load', startCamera);
+            // Redirecionar para a página de envio
+            window.location.href = 'submit.html';  // Enviar para outra página
+        });
     </script>
 
 </body>
