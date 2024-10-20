@@ -16,11 +16,18 @@
             position: relative;
         }
 
+        /* A div que contém o vídeo e o botão */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* O vídeo da câmera ocupará a tela toda */
         video {
             width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+            height: 100%;
+            object-fit: cover; /* Garante que o vídeo cubra toda a tela */
         }
 
         /* Canvas também ocupa a tela toda */
@@ -31,7 +38,9 @@
         /* Estilo do botão de captura */
         .capture-btn {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px; /* Colocado 30px acima da parte inferior da tela */
+            left: 50%;
+            transform: translateX(-50%); /* Centraliza o botão horizontalmente */
             background-color: #007bff;
             color: white;
             padding: 15px 30px;
@@ -52,9 +61,11 @@
 </head>
 <body>
 
-    <video id="camera" autoplay playsinline></video>
-    <canvas id="photoCanvas"></canvas>
-    <button class="capture-btn" id="captureButton">Tirar Foto</button>
+    <div class="camera-container">
+        <video id="camera" autoplay playsinline></video>
+        <canvas id="photoCanvas"></canvas>
+        <button class="capture-btn" id="captureButton">Tirar Foto</button>
+    </div>
 
     <script>
         const video = document.getElementById('camera');
@@ -64,7 +75,7 @@
         // Acessar a câmera traseira
         navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: { exact: "environment" } // Câmera traseira
+                facingMode: { exact: "environment" } // Solicita a câmera traseira
             }
         })
         .then(stream => {
