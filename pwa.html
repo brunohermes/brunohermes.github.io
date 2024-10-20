@@ -1,5 +1,9 @@
-<button id="installButton" style="display:none;">Instalar o App</button>
+<html>
+    
+<link rel="manifest" href="/manifest.json">
 
+<button id="installButton" style="display:none;">Instalar o App</button>
+</html>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
