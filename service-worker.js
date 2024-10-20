@@ -5,8 +5,8 @@ self.addEventListener('install', function(event) {
             return cache.addAll([
                 '/index.html',
                 '/manifest.json',
-                '/icons/icon-192x192.png',
-                '/icons/icon-512x512.png',
+                '/icon-192x192.png',
+                '/icon-192x192.png',
                 // Adicione outros arquivos que você quer cachear
             ]);
         })
