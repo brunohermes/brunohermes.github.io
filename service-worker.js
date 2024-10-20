@@ -6,7 +6,7 @@ self.addEventListener('install', function(event) {
                 '/index.html',
                 '/manifest.json',
                 '/icon-192x192.png',
-                '/icon-192x192.png',
+                '/icon-512x512.png',
                 // Adicione outros arquivos que você quer cachear
             ]);
         })
