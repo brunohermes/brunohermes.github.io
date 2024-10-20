@@ -1,44 +1,99 @@
-<html>
-    
-<link rel="manifest" href="/manifest.json">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA com Instalação</title>
 
-<button id="installButton" style="display:none;">Instalar o App</button>
-</html>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                console.log('Service Worker registrado com sucesso:', registration);
-            }, function(err) {
-                console.log('Falha ao registrar o Service Worker:', err);
+    <!-- Link para o manifest.json -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Estilos básicos -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* Estilo do botão de instalação */
+        #installButton {
+            display: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #installButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Instale Nosso App!</h1>
+    <button id="installButton">Instalar App</button>
+
+    <!-- Registro do Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('Service Worker registrado com sucesso:', registration);
+                }, function(err) {
+                    console.log('Falha ao registrar o Service Worker:', err);
+                });
+            });
+        }
+    </script>
+
+    <!-- Script para lidar com a instalação do PWA -->
+    <script>
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        // Detectar o evento 'beforeinstallprompt'
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevenir que o navegador mostre o prompt padrão
+            e.preventDefault();
+            // Guardar o evento para acionar o prompt mais tarde
+            deferredPrompt = e;
+            // Exibir o botão de instalação
+            installButton.style.display = 'block';
+
+            // Quando o botão for clicado, exibir o prompt de instalação
+            installButton.addEventListener('click', () => {
+                // Ocultar o botão
+                installButton.style.display = 'none';
+                // Exibir o prompt de instalação
+                deferredPrompt.prompt();
+                // Verificar a escolha do usuário
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuário aceitou a instalação');
+                    } else {
+                        console.log('Usuário recusou a instalação');
+                    }
+                    deferredPrompt = null;
+                });
             });
         });
-    }
-</script>
-<script>
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton'); // Botão para instalação
+    </script>
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Previne o popup padrão
-        e.preventDefault();
-        deferredPrompt = e;
-        // Mostra o botão para instalar o PWA
-        installButton.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', () => {
-        // Oculta o botão de instalação
-        installButton.style.display = 'none';
-        // Mostra o popup de instalação do navegador
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('Usuário aceitou a instalação');
-            } else {
-                console.log('Usuário recusou a instalação');
-            }
-            deferredPrompt = null;
-        });
-    });
-</script>
+</body>
+</html>
