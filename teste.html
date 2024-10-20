@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capturar Foto</title>
+    <title>Capturar Foto (Câmera Traseira)</title>
     <style>
         body, html {
             margin: 0;
@@ -12,16 +12,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             background-color: #000;
+            position: relative;
         }
 
         video {
             width: 100%;
             height: auto;
             display: block;
+            object-fit: cover;
         }
 
+        /* Canvas também ocupa a tela toda */
+        canvas {
+            display: none;
+        }
+
+        /* Estilo do botão de captura */
         .capture-btn {
             position: absolute;
             bottom: 20px;
@@ -35,14 +42,11 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: background-color 0.3s ease;
+            z-index: 10; /* Garante que o botão fique sobre o vídeo */
         }
 
         .capture-btn:hover {
             background-color: #0056b3;
-        }
-
-        canvas {
-            display: none;
         }
     </style>
 </head>
@@ -57,14 +61,18 @@
         const canvas = document.getElementById('photoCanvas');
         const captureButton = document.getElementById('captureButton');
 
-        // Acessar a câmera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Erro ao acessar a câmera: ", err);
-            });
+        // Acessar a câmera traseira
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { exact: "environment" } // Câmera traseira
+            }
+        })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("Erro ao acessar a câmera: ", err);
+        });
 
         // Tirar foto
         captureButton.addEventListener('click', () => {
