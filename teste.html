@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capturar Foto (Câmera Traseira)</title>
+    <!-- Importando FontAwesome para usar o ícone de câmera -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body, html {
             margin: 0;
@@ -35,7 +37,7 @@
             display: none;
         }
 
-        /* Estilo do botão de captura */
+        /* Estilo do botão de captura com ícone */
         .capture-btn {
             position: absolute;
             bottom: 30px; /* Colocado 30px acima da parte inferior da tela */
@@ -44,7 +46,7 @@
             background-color: #007bff;
             color: white;
             padding: 15px 30px;
-            font-size: 18px;
+            font-size: 24px; /* Tamanho do ícone */
             border: none;
             border-radius: 50px;
             cursor: pointer;
@@ -52,6 +54,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: background-color 0.3s ease;
             z-index: 10; /* Garante que o botão fique sobre o vídeo */
+        }
+
+        .capture-btn i {
+            font-size: 24px; /* Tamanho do ícone */
         }
 
         .capture-btn:hover {
@@ -64,7 +70,9 @@
     <div class="camera-container">
         <video id="camera" autoplay playsinline></video>
         <canvas id="photoCanvas"></canvas>
-        <button class="capture-btn" id="captureButton">Tirar Foto</button>
+        <button class="capture-btn" id="captureButton">
+            <i class="fas fa-camera"></i> <!-- Ícone de câmera -->
+        </button>
     </div>
 
     <script>
